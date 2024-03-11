@@ -28,7 +28,7 @@ public class Masker(
             alphabet = Shuffle(_alphabet, alphabet)[1..];
             var counter = mask.Length;
             while (mask.Length < minLength)
-                mask += alphabet[2..][counter++ % (alphabet.Length - 2)];
+                mask += alphabet[counter++ % alphabet.Length];
         }
         return mask;
     }
