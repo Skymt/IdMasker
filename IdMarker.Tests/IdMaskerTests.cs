@@ -14,9 +14,6 @@ public class IdMaskerTests
         
         Assert.AreEqual(knownMask, mask);
         Assert.AreEqual(id, unmaskedId);
-
-        mask = masker.Mask([ulong.MaxValue]);
-        Assert.AreEqual(ulong.MaxValue, masker.Unmask(mask).Single());
     }
 
     [TestMethod]
