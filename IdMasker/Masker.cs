@@ -85,8 +85,11 @@ public class Masker(
         var alphabetLength = (ulong)alphabet.Length;
         for (var i = 0; i < mask.Length; i++)
         {
-            var magnitude = mask.Length - i - 1;
-            id += (ulong)(alphabet.IndexOf(inputChars[magnitude]) * Math.Pow(alphabetLength, magnitude));
+            var position = mask.Length - 1 - i;
+            var value = (ulong)alphabet.IndexOf(inputChars[position]);
+            var magnitude = 1ul;
+            for(var j = 0; j < position; j++) magnitude *= alphabetLength;
+            id += value * magnitude;
         }
 
         return id;

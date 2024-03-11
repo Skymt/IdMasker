@@ -14,6 +14,9 @@ public class IdMaskerTests
         
         Assert.AreEqual(knownMask, mask);
         Assert.AreEqual(id, unmaskedId);
+
+        mask = masker.Mask([ulong.MaxValue]);
+        Assert.AreEqual(ulong.MaxValue, masker.Unmask(mask).Single());
     }
 
     [TestMethod]
@@ -27,7 +30,19 @@ public class IdMaskerTests
     }
 
     [TestMethod]
-    public void T3_Padding()
+    public void T3_Edges()
+    {
+        Masker masker = new();
+
+        var mask = masker.Mask([ulong.MinValue]);
+        Assert.AreEqual(ulong.MinValue, masker.Unmask(mask).Single());
+
+        mask = masker.Mask([ulong.MaxValue]);
+        Assert.AreEqual(ulong.MaxValue, masker.Unmask(mask).Single());
+    }
+
+    [TestMethod]
+    public void T4_Padding()
     {
         Masker masker = new();
         ulong id = 100001;
@@ -42,7 +57,7 @@ public class IdMaskerTests
     }
 
     [TestMethod]
-    public void T4_Salt()
+    public void T5_Salt()
     {
         Masker masker1 = new(salt: "This is the first salt");
         Masker masker2 = new(salt: "The second salt is different");
@@ -56,7 +71,7 @@ public class IdMaskerTests
     }
 
     [TestMethod]
-    public void T5_Alphabet()
+    public void T6_Alphabet()
     {
         Masker masker = new(alphabet: "abcdefABCDEF");
         ulong id = 100001;
