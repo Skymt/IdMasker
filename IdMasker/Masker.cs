@@ -1,10 +1,18 @@
 ﻿namespace IdMasker;
-public class Masker(
-    string salt = "The salt. Best to bring your own...",
-    string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+public class Masker
 {
-    readonly string _alphabet = Shuffle(alphabet, salt);
-    readonly string _salt = salt;
+    readonly string _alphabet;
+    readonly string _salt;
+    public Masker(
+        string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        string salt = "The salt. Best to bring your own...")
+    {
+        if(alphabet.Length < 4) throw new ArgumentException("The alphabet must be at least 4 characters long.");
+
+        _alphabet = Shuffle(alphabet, salt);
+        _salt = salt;
+    }
+
 
     public string Mask(IEnumerable<ulong> ids, int minLength = 0)
     {
@@ -95,7 +103,7 @@ public class Masker(
     }
 }
 
-// This uses an end-of-mask character to terminate each mask
+// SaferMasker uses an end-of-mask character to terminate each mask
 // which makes it harder to guess valid masks. If the marker is missing
 // no ids will be decoded at all.
 // A long random mask, may produce some values, but the chance is greater
@@ -103,12 +111,19 @@ public class Masker(
 // 
 // An upside is that only one character of the alphabet is reserved for special use.
 // But the mask will be one character longer than the other maskers masks.
-public class SaferMasker(
-    string salt = "The salt. Best to bring your own...",
-    string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+public class SaferMasker
 {
-    readonly string _alphabet = Shuffle(alphabet, salt);
-    readonly string _salt = salt;
+    readonly string _alphabet;
+    readonly string _salt;
+    public SaferMasker(
+        string alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        string salt = "The salt. Best to bring your own...")
+    {
+        if (alphabet.Length < 3) throw new ArgumentException("The alphabet must be at least 3 characters long.");
+
+        _alphabet = Shuffle(alphabet, salt);
+        _salt = salt;
+    }
 
     public string Mask(IEnumerable<ulong> ids, int minLength = 0)
     {

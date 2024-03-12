@@ -1,4 +1,5 @@
 ﻿using IdMasker;
+using System.Numerics;
 
 Masker masker = new();
 Console.WriteLine("Welcome to the IdMasker demo!");
@@ -55,4 +56,42 @@ foreach (var (unmasked_id, source_id) in sourceIdsAndUnmaskedIds)
     var singleUnmasked = masker.Unmask(singleMask).Single();
 
     Console.WriteLine($"{source_id:000000}     {unmasked_id:000000}     {singleMask}\t {singleUnmasked}");
+}
+
+var clearTextPnr1 = "19800101T1234";
+var clearTextPnr2 = "19770712-9876";
+var maskedPnr1 = Encode(clearTextPnr1);
+var maskedPnr2 = Encode(clearTextPnr2);
+var unmaskedPnr1 = Decode(maskedPnr1);
+var unmaskedPnr2 = Decode(maskedPnr2);
+return 0;
+
+string Encode(string pnr)
+{
+    var numerical_pnr = ConvertBase(pnr, "-T0987654321", "0123456789");
+    return masker.Mask([ulong.Parse(numerical_pnr)]);
+}
+string Decode(string mask)
+{
+    var numerical_pnr = masker.Unmask(mask).Single().ToString();
+    return ConvertBase(numerical_pnr, "0123456789", "-X0987654321");
+}
+string ConvertBase(string input, string sourceDigitSet, string targetDigitSet)
+{
+    BigInteger amount = 0;
+
+    int positionExponent = 0;
+    int sourceBase = sourceDigitSet.Length;
+    int targetBase = targetDigitSet.Length;
+    var inputStack = new Stack<char>(input);
+    //For every digit, sum up its value, which is equal to its index in the digit set multiplied with the power of its position.
+    while (inputStack.Count > 0) amount += sourceDigitSet.IndexOf(inputStack.Pop()) * BigInteger.Pow(sourceBase, positionExponent++);
+
+    string result = string.Empty;
+    //Add the digit from the target digit set that represents the remainder of the amount divided by the target base
+    do result = targetDigitSet[(int)(amount % targetBase)] + result;
+    //and store the amount of that division as integer while it doesn't equal 0.
+    while ((amount /= targetBase) > 0);
+
+    return result;
 }
