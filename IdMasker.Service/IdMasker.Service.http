@@ -1,0 +1,17 @@
+@HostAddress = http://localhost:5268
+
+@Id = 100115
+GET {{HostAddress}}/mask/{{Id}}
+Accept: application/json
+
+###
+@Mask = Z2xn
+GET {{HostAddress}}/unmask/{{Mask}}
+Accept: application/json
+
+###
+
+GET {{HostAddress}}/mask/{{Id}}?minLength=12
+Accept: application/json
+
+###
