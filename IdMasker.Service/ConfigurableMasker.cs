@@ -1,10 +1,7 @@
 ﻿namespace IdMasker.Service
 {
-    public class ConfigurableMasker : Masker
-    {
-        public ConfigurableMasker(IConfiguration configuration) : base(
-            configuration["Masker:Alphabet"]!,
-            configuration["Masker:Salt"]!
+    public class ConfigurableMasker(IConfiguration configuration) : Masker(
+        configuration["Masker:Alphabet"]!,
+        configuration["Masker:Salt"]!
         ) { }
-    }
 }
