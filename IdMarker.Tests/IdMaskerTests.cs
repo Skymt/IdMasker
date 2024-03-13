@@ -21,8 +21,10 @@ public class IdMaskerTests
     {
         Masker masker = new();
         ulong[] ids = [100001, 100002, 100003, 100004, 100005];
+        string knownMask = "GtUVvwqvHmyQUIH5KD60";
 
         var mask = masker.Mask(ids);
+        Assert.AreEqual(knownMask, mask);
         CollectionAssert.AreEqual(ids, masker.Unmask(mask).ToList());
     }
 

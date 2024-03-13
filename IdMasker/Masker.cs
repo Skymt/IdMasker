@@ -17,7 +17,8 @@ public class Masker
     public string Mask(IEnumerable<ulong> ids, int minLength = 0)
     {
         var firstId = ids.First();
-        var shuffleseed = _alphabet[(int)((firstId + (ulong)ids.Count()) % (ulong)_alphabet.Length)];
+        var seed = (ulong)(firstId + (ulong)ids.Count());
+        var shuffleseed = _alphabet[(int)(seed % (ulong)_alphabet.Length)];
         var alphabet = Shuffle(_alphabet, shuffleseed + _salt);
 
         var mask = shuffleseed + Encode(firstId, alphabet[2..]);
@@ -32,10 +33,9 @@ public class Masker
         if (mask.Length < minLength)
         {
             mask += alphabet[0];
-            alphabet = Shuffle(_alphabet, alphabet)[1..];
-            var counter = mask.Length;
-            while (mask.Length < minLength)
-                mask += alphabet[counter++ % alphabet.Length];
+            alphabet = Shuffle(_alphabet, alphabet);
+            while (mask.Length < minLength) 
+                mask += alphabet[mask.Length % alphabet.Length];
         }
         return mask;
     }
@@ -102,6 +102,13 @@ public class Masker
         return id;
     }
 }
+
+
+
+
+
+
+
 
 // SaferMasker uses an end-of-mask character to terminate each mask
 // which makes it harder to guess valid masks. If the marker is missing
