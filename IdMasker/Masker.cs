@@ -63,11 +63,12 @@ public class Masker
     static string Shuffle(string characters, string salt)
     {
         var chars = characters.ToCharArray();
-        int salter = 0, accumulator = 0, salt_value;
-        for (int target = chars.Length - 1; target > 0; target--, salter++)
+        int accumulator = 0, salt_index = 0;
+        for (int target = chars.Length - 1; target > 0; target--, salt_index++)
         {
-            accumulator += salt_value = salt[salter %= salt.Length];
-            var source = (salt_value + salter + accumulator) % target;
+            salt_index %= salt.Length;
+            accumulator += salt[salt_index];
+            var source = (salt_index + accumulator) % target;
             (chars[target], chars[source]) = (chars[source], chars[target]);
         }
 
@@ -117,6 +118,8 @@ public class Masker
 // that the mask will overflow the ulong datatype instead.
 // 
 // An upside is that only one character of the alphabet is reserved for special use.
+// (Padding is just ignored since it does not have the end-of-mask character, and does
+// not have to be protected by a "guard" character).
 // But the mask will be one character longer than the other maskers masks.
 public class SaferMasker
 {
@@ -175,11 +178,12 @@ public class SaferMasker
     static string Shuffle(string characters, string salt)
     {
         var chars = characters.ToCharArray();
-        int salter = 0, accumulator = 0, salt_value;
-        for (int target = chars.Length - 1; target > 0; target--, salter++)
+        int accumulator = 0, salt_index = 0;
+        for (int target = chars.Length - 1; target > 0; target--, salt_index++)
         {
-            accumulator += salt_value = salt[salter %= salt.Length];
-            var source = (salt_value + salter + accumulator) % target;
+            salt_index %= salt.Length;
+            accumulator += salt[salt_index];
+            var source = (salt_index + accumulator) % target;
             (chars[target], chars[source]) = (chars[source], chars[target]);
         }
 

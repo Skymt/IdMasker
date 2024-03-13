@@ -4,12 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddSingleton<Masker, ConfigurableMasker>();
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 
 app.MapGet("/mask/{idString}", (string idString, Masker masker, [FromQuery]int minLength = 0) =>
 {
