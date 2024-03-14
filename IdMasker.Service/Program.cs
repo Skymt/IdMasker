@@ -1,10 +1,13 @@
 using IdMasker;
-using IdMasker.Service;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<Masker, ConfigurableMasker>();
+builder.Services.AddSingleton<Masker>(services =>
+{
+    var config = services.GetRequiredService<IConfiguration>();
+    return new(config["IdMasker:Alphabet"]!, config["IdMasker:Salt"]!);
+});
 
 var app = builder.Build();
 
