@@ -38,7 +38,11 @@ Console.WriteLine("The shortest possible alphabet is 4 characters, as two charac
 Console.WriteLine("This would mean two symbols are left for the id, which is basically a binary representation.");
 Console.WriteLine("To illustrate, the alphabet '01ab' is used here.");
 Console.WriteLine($"uint.MaxValue - 2: {new Masker(alphabet: "01ab").Mask([uint.MaxValue - 2])} (33 characters)");
-Console.WriteLine("(The first '1' is the shuffle seed then 32 symbols to represent the bits).\n");
+Console.WriteLine("(The first 'b' is the shuffle seed then 32 symbols to represent the bits.");
+Console.WriteLine("And since it is a single, unpadded id, no guard or separator character is needed).\n");
+
+Console.WriteLine($"Should the generated mask be inapropriate, like how 7501417 decodes to '{masker.Mask([7501417])}'.. :S");
+Console.WriteLine($"..it is possible to add an increment to the mask to change the shuffle seed.\n");
 
 // Create both random and sequential ids.
 var aBunchOfIds = Enumerable.Range(0, 10).Select(_ => (ulong)Random.Shared.Next(1000000)).Union(Enumerable.Range(101000, 10).Select(v => (ulong)v)).ToArray();
@@ -58,40 +62,32 @@ foreach (var (unmasked_id, source_id) in sourceIdsAndUnmaskedIds)
     Console.WriteLine($"{source_id:000000}     {unmasked_id:000000}     {singleMask}\t {singleUnmasked}");
 }
 
-var clearTextPnr1 = "19800101T1234";
-var clearTextPnr2 = "19770712-9876";
-var maskedPnr1 = Encode(clearTextPnr1);
-var maskedPnr2 = Encode(clearTextPnr2);
-var unmaskedPnr1 = Decode(maskedPnr1);
-var unmaskedPnr2 = Decode(maskedPnr2);
-return 0;
+// Demo impl
+var alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; // This is what the masker shuffles
+var decimal_digits = "0123456789";
+ulong test_id = 123456789;
+string test_conversion = ConvertBase(test_id.ToString(), decimal_digits, alphabet); // => "iwaUH"
+string test_reconversion = ConvertBase(test_conversion, alphabet, decimal_digits);  // => "123456789"
+ulong result_id = ulong.Parse(test_reconversion);
+if(result_id != test_id) throw new Exception("The universe is borked.");
 
-string Encode(string pnr)
-{
-    var numerical_pnr = ConvertBase(pnr, "-T0987654321", "0123456789");
-    return masker.Mask([ulong.Parse(numerical_pnr)]);
-}
-string Decode(string mask)
-{
-    var numerical_pnr = masker.Unmask(mask).Single().ToString();
-    return ConvertBase(numerical_pnr, "0123456789", "-X0987654321");
-}
-string ConvertBase(string input, string sourceDigitSet, string targetDigitSet)
+// Convert a non-negative integer number expressed with sourceDigitSet to a number of the same amount expressed with targetDigitSet.
+static string ConvertBase(string number, string sourceDigitSet, string targetDigitSet)
 {
     BigInteger amount = 0;
 
     int positionExponent = 0;
     int sourceBase = sourceDigitSet.Length;
     int targetBase = targetDigitSet.Length;
-    var inputStack = new Stack<char>(input);
-    //For every digit, sum up its value, which is equal to its index in the digit set multiplied with the power of its position.
+    var inputStack = new Stack<char>(number);
     while (inputStack.Count > 0) amount += sourceDigitSet.IndexOf(inputStack.Pop()) * BigInteger.Pow(sourceBase, positionExponent++);
 
-    string result = string.Empty;
-    //Add the digit from the target digit set that represents the remainder of the amount divided by the target base
-    do result = targetDigitSet[(int)(amount % targetBase)] + result;
-    //and store the amount of that division as integer while it doesn't equal 0.
-    while ((amount /= targetBase) > 0);
+    string result = string.Empty; BigInteger remainder;
+    do
+    {
+        (amount, remainder) = BigInteger.DivRem(amount, targetBase);
+        result = targetDigitSet[(int)remainder] + result;
+    } while (amount > 0);
 
     return result;
 }

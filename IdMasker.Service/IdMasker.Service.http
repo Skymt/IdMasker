@@ -5,7 +5,7 @@ GET {{HostAddress}}/mask/{{Id}}
 Accept: application/json
 
 ###
-@Mask = DGzP
+@Mask = YW13
 GET {{HostAddress}}/unmask/{{Mask}}
 Accept: text/plain
 

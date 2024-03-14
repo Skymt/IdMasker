@@ -11,7 +11,7 @@ public class IdMaskerTests
 
         var mask = masker.Mask([id]);
         var unmaskedId = masker.Unmask(mask).Single();
-        
+
         Assert.AreEqual(knownMask, mask);
         Assert.AreEqual(id, unmaskedId);
     }
@@ -45,7 +45,7 @@ public class IdMaskerTests
     {
         Masker masker = new();
         ulong id = 100001;
-        
+
         var mask = masker.Mask([id]);
         Assert.IsTrue(mask.Length < 8);
         Assert.AreEqual(id, masker.Unmask(mask).Single());
@@ -81,5 +81,25 @@ public class IdMaskerTests
             Assert.IsTrue("abcdefABCDEF".Contains(c));
         }
         Assert.AreEqual(id, masker.Unmask(mask).Single());
+    }
+
+    [TestMethod]
+    public void T7_TestDirtyWords()
+    {
+        Masker masker = new();
+        var id = 7501417ul;
+        var dirtyWord = "Fi0D"; // Shame on you if you say this out loud! :P
+
+        var mask1 = masker.Mask([id], minLength: 12);
+        Assert.IsTrue(mask1.Contains(dirtyWord));
+        Assert.AreEqual(id, masker.Unmask(mask1).Single());
+
+        if(mask1.Contains(dirtyWord))
+        {
+            // Dirty word detected - regenerate the mask with an increment.
+            var mask2 = masker.Mask([7501417], minLength: 12, increment: 1);
+            Assert.IsFalse(mask2.Contains(dirtyWord));
+            Assert.AreEqual(id, masker.Unmask(mask2).Single());
+        }
     }
 }
