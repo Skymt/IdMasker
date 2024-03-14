@@ -5,13 +5,19 @@ GET {{HostAddress}}/mask/{{Id}}
 Accept: application/json
 
 ###
-@Mask = Z2xn
+@Mask = DGzP
 GET {{HostAddress}}/unmask/{{Mask}}
-Accept: application/json
+Accept: text/plain
 
 ###
 
 GET {{HostAddress}}/mask/{{Id}}?minLength=12
-Accept: application/json
+Accept: text/plain
+
+###
+
+@Ids = 100115,100116,100117,100118,100119,100120,100121,100122,100123,100124
+GET {{HostAddress}}/mask/{{Ids}}
+Accept: text/plain
 
 ###
